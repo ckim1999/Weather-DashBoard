@@ -14,7 +14,37 @@
 <body>
 
     <h1>Weather Dashboard</h1>
-    <script src="dash.js"></script>
+
+    <div class="row">
+        <div class="col-md-3">
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="search" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+    
+        // create a click function when user presses the search button
+        $(".search").on("click", function() {
+            // creating a variable for my API key for openweather api
+            var APIKey = "452a81a2af18090604bf5a6da3cb5157";
+
+            var place = $(this).attr("data-name");
+            // reference the url from the api
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + place + "&appid=" + APIKey;
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function(response) {
+                console.log(response);
+            });
+        });
+    
+
+    </script>
     
 </body>
 </html>
