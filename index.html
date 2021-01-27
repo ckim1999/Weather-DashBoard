@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="weather.css">
     <!--Link to Bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 
 </head>
 <body>
@@ -17,29 +18,74 @@
 
     <div class="row">
         <div class="col-md-3">
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="search" type="submit">Search</button>
+            <form id="searchBar">
+                <input type="text" id="search-input">
+                <button id="search">Search</button>
             </form>
+        </div>
+        <div class="col-md-8">
+            <div class="jumbotron jumbotron-fluid" style="background-color: lightgreen;">
+                <div class="container">
+                    <h2 class="city"></h2>
+                    <br>
+                    <div class="temp"></div>
+                    <br>
+                    <div class="humidity"></div>
+                    <br>
+                    <div class="wind-speed"></div>
+                    <br>
+                    <div class="uv"></div>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type="text/javascript">
     
         // create a click function when user presses the search button
-        $(".search").on("click", function() {
-            // creating a variable for my API key for openweather api
-            var APIKey = "452a81a2af18090604bf5a6da3cb5157";
-
-            var place = $(this).attr("data-name");
+        $("#search").on("click", function(event) {
+            // prevent the page from refreshing
+            event.preventDefault()
+            // creating a variable to reference to queryURL
+            var city = $("#search-input").val();
             // reference the url from the api
-            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + place + "&appid=" + APIKey;
+            var queryURL = "https://api.openweathermap.org/data/2.5/weather?&q=" + city + "&appid=452a81a2af18090604bf5a6da3cb5157";
 
             $.ajax({
                 url: queryURL,
                 method: "GET"
             }).then(function(response) {
+                console.log("queryURL:", queryURL);
                 console.log(response);
+                // display the city and date
+                $(".city").text("City-" + response.name + moment().format(" (" + "MMMM Do, YYYY" + ")"));
+                // display the temperature
+                $(".temp").text("Temperature: " + response.main.temp + " ℉");
+                // display the humidity
+                $(".humidity").text("Humidity: " + response.main.humidity + " %");
+                // display the wind speed
+                $(".wind-speed").text("Wind Speed: " + response.wind.speed + " MPH");
+                
+                // creating a lat and lon varaible to reference to queryURL2
+                var lat = (response.coord.lat);
+                var lon = (response.coord.lon);
+                // reference the url from the api
+                var queryURL2 = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=452a81a2af18090604bf5a6da3cb5157";
+
+                $.ajax({
+                    url: queryURL2,
+                    method: "GET"
+                }).then(function(response) {
+                    console.log("queryURL2:", queryURL2);
+                    console.log(response);
+                    // creating a uv variable to be able to make an if condition for it
+                    var uv = (response.value);
+                    $(".uv").text("UV Index: " + uv);
+                    if (uv > 2) {
+                        uv.css("background-color", "blue");
+                    }
+                });
             });
         });
     
